@@ -1,0 +1,9 @@
+
+{% extends "layout.html" %}
+{% block body %}
+
+		{% from 'users/_form.html' import user_form %}
+
+    {{ user_form(form_name = 'Update', url = site.url, content = site.content, tag = site.tag) }}
+
+{% endblock %}

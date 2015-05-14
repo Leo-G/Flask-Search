@@ -1,0 +1,23 @@
+
+{% macro user_form(form_name = '', url='', content='', tag = '') %}
+
+        <div class="center row">
+            <div class="large-8 columns">
+            <h4> {{ form_name }} Sites</h4>
+               <fieldset>
+                <form action="" method="POST" >
+
+				  <label>URL <small>required</small><input type="url" name="url" value="{{ url }}"  required/>	 </label>
+          <label> Content<textarea type="text" id="content" name="content" rows="20" > {{ content}} </textarea></label>
+				   <label>Tag <small>required</small><input type="text" name="tag" value="{{ tag }}"  required/>	 </label>
+
+				   <button class="button "  type="submit">{{ form_name }}</button>
+                  </form>
+                </fieldset>
+
+
+				</div>
+			  </div>
+
+  
+{% endmacro %}
