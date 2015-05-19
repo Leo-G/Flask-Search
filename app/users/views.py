@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request,flash, redirect, url_for
-from app.users.models import Sites, SitesSchema
+from app.users.models import Sites, SitesSchema, db
 
 users = Blueprint('users', __name__)
 #http://marshmallow.readthedocs.org/en/latest/quickstart.html#declaring-schemas
@@ -9,7 +9,7 @@ schema = SitesSchema()
 @users.route('/' )
 def user_index():
     sites = Sites.query.all()
-    results = schema.dump(sites, many=True).data
+    results = schema.dump(sites, many=True).data           
     return render_template('/users/index.html', results=results)
 
 @users.route('/add' , methods=['POST', 'GET'])
@@ -89,3 +89,25 @@ def delete (data, fail_url=''):
           message=delete
           flash(message)
      return redirect(url_for(fail_url))
+     
+#Create  Triggers and Functions
+@users.route('/trigger', methods=['GET'])
+def trig():
+   SQL = db.text("""CREATE OR REPLACE FUNCTION search_trigger() RETURNS trigger AS $$
+                begin
+                  new.tsv :=
+                    setweight(to_tsvector(coalesce(new.url,'')), 'B') ||
+                    setweight(to_tsvector(coalesce(new.content,'')), 'C')||
+                    setweight(to_tsvector(coalesce(new.tag,'')), 'A');
+                  return new;
+                end
+                $$ LANGUAGE plpgsql""")
+   db.engine.execute(SQL)
+   SQL1 = db.text("""CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+               ON sites FOR EACH ROW EXECUTE PROCEDURE search_trigger();""")
+   db.engine.execute(SQL1)
+   return "Done"
+      
+ 
+
+
