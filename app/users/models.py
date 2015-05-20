@@ -1,14 +1,25 @@
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy, BaseQuery
 from sqlalchemy.exc import SQLAlchemyError
 from marshmallow import Schema, fields, validate
+#http://sqlalchemy-utils.readthedocs.org/en/latest/installation.html
+from sqlalchemy_utils.types import TSVectorType
+
+from sqlalchemy_searchable import make_searchable
+from sqlalchemy_searchable import SearchQueryMixin
 
 db = SQLAlchemy()
+make_searchable()
 
+class SitesQuery(BaseQuery, SearchQueryMixin):
+    pass
+    
 class Sites(db.Model):
+  query_class = SitesQuery
   id = db.Column(db.Integer, primary_key=True)
   url = db.Column(db.String(250), nullable=False)
   content = db.Column(db.Text)
   tag = db.Column(db.String(250), nullable=False)
+  search = db.Column(TSVectorType('url', 'content', 'tag'))
 
   def __init__(self,url, content, tag):
     self.url = url
@@ -32,11 +43,14 @@ class SitesSchema(Schema):
     not_blank = validate.Length(min=1, error='Field cannot be blank')
     url = fields.Url()
     content = fields.String()
+    #add import sqlalchemy_utils in alembic file
     tag = fields.String(required = True, validate = not_blank)
+    
+     
 
 
     class Meta:
-       fields = ('id', 'url', 'content', 'tag')
+       fields = ('id', 'url', 'content', 'tag', 'search')
 
 
 def  session_commit ():

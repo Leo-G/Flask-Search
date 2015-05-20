@@ -5,12 +5,23 @@ users = Blueprint('users', __name__)
 #http://marshmallow.readthedocs.org/en/latest/quickstart.html#declaring-schemas
 schema = SitesSchema()
 
+
+#main
+@users.route('/search', methods=['POST', 'GET'])
+def search():
+   results = None
+   if request.method == 'POST':
+           search = request.form['search']
+           query = Sites.query.search(search).all()
+           results = schema.dump(query, many=True).data
+   return render_template('search.html', results=results)
+   
 #Sites
 @users.route('/' )
 def user_index():
     sites = Sites.query.all()
-    results = schema.dump(sites, many=True).data           
-    return render_template('/users/index.html', results=results)
+    results = schema.dump(sites, many=True).data
+    return render_template('/users/index.html', results=results, search=search)
 
 @users.route('/add' , methods=['POST', 'GET'])
 def user_add():
@@ -93,9 +104,11 @@ def delete (data, fail_url=''):
 #Create  Triggers and Functions
 @users.route('/trigger', methods=['GET'])
 def trig():
+   SQL_index = db.text("""CREATE INDEX tsv_idx ON sites USING gin(search) """)
+   db.engine.execute(SQL_index)
    SQL = db.text("""CREATE OR REPLACE FUNCTION search_trigger() RETURNS trigger AS $$
                 begin
-                  new.tsv :=
+                  new.search :=
                     setweight(to_tsvector(coalesce(new.url,'')), 'B') ||
                     setweight(to_tsvector(coalesce(new.content,'')), 'C')||
                     setweight(to_tsvector(coalesce(new.tag,'')), 'A');
