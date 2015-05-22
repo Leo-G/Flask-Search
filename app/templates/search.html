@@ -29,7 +29,7 @@
             <table> <thead><tr><th>URL</th><th>Content</th><th>Tag</th></tr></thead>
              <tbody>
              {% if results is not none %}
-              {% for result in results %}
+              {% for result in results.items %}
               <tr><td><a href="{{ result['url'] }}" target="_blank">{{ result['url'] }}</a> </td><td>{{ result['content'] }}</td><td>{{ result['tag'] }}</td>                 
                 </tr>
                 {% endfor %}
@@ -39,6 +39,8 @@
           </div>
         </div>
      
+{% if results.has_prev %}<a href="{{ url_for('search', page=results.prev_num) }}">&lt;&lt; Newer results</a>{% else %}&lt;&lt; Newer results{% endif %} | 
+{% if results.has_next %}<a href="{{ url_for('search', page=results.next_num) }}">Older results &gt;&gt;</a>{% else %}Older results &gt;&gt;{% endif %}    
  {% endblock %}
  
  

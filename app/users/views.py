@@ -7,21 +7,28 @@ schema = SitesSchema()
 
 
 #main
+@users.route('/search/<int:page>', methods=['GET', 'POST'], )
 @users.route('/search', methods=['POST', 'GET'])
-def search():
+def search(page=1):
    results = None
    if request.method == 'POST':
-           search = request.form['search']
-           query = Sites.query.search(search).all()
-           results = schema.dump(query, many=True).data
+           search_string = request.form['search']
+           #results = Sites.query.from_statement(db.text("select * from sites where search @@ to_tsquery(:search)")).params(search=search).all()
+           query = Sites.query.search(search_string)
+           #query.search('somesearchstring')
+           results = query.paginate(page=1, per_page=1, error_out=True)
+           
+           #paginate(page, per_page=1, error_out=True).search(search).all()
+           #results = schema.dump(query, many=True).data
    return render_template('search.html', results=results)
    
 #Sites
 @users.route('/' )
 def user_index():
+    print(db.func.to_tsquery("3.4"))
     sites = Sites.query.all()
     results = schema.dump(sites, many=True).data
-    return render_template('/users/index.html', results=results, search=search)
+    return render_template('/users/index.html', results=results)
 
 @users.route('/add' , methods=['POST', 'GET'])
 def user_add():
