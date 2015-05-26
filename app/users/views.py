@@ -21,7 +21,7 @@ def results(page=1):
        search_string = request.args.get('search', '')
        #results = Sites.query.from_statement(db.text("select * from sites where search @@ to_tsquery(:search)")).params(search=search).all()
        query = Sites.query.search(search_string)           
-       results = query.paginate(page=page, per_page=1)           
+       results = query.paginate(page=page, per_page=10)           
        #paginate(page, per_page=1, error_out=True).search(search).all()
        #results = schema.dump(query, many=True).data
        return render_template('results.html', results=results)
@@ -32,7 +32,7 @@ def results(page=1):
 def user_index(page=1):
     
     sites = Sites.query
-    results = sites.paginate(page=page, per_page=5)
+    results = sites.paginate(page=page, per_page=10)
     #results = schema.dump(sites, many=True).data
     return render_template('/users/index.html', results=results)
 
