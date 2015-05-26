@@ -11,8 +11,8 @@
              <div class="small-12 columns">
             <table> <thead><tr><th>URL</th><th>Content</th><th>Tag</th></tr></thead>
              <tbody>
-             {% for result in results %}
-              <tr><td>{{ result['url'] }}</td><td>{{ result['content'] }}</td><td>{{ result['tag'] }}</td>
+             {% for result in results.items %}
+              <tr><td><a href="{{ result['url'] }}" target="_blank">{{ result['url'] }}</a> </td><td>{{ result['content'] }}</td><td>{{ result['tag'] }}</td>
                  <td><a href="{{ url_for('users.user_update', id=result['id']) }}">Edit</a>        <a href="{{ url_for('users.user_delete', id=result['id']) }}">Delete</a></td>
                 </tr>
                 {% endfor %}
@@ -20,6 +20,7 @@
             </table>
           </div>
         </div>
-
+{% if results.has_prev %}<a href="{{ url_for('users.user_index', page=results.prev_num) }}">&lt;&lt; Older results</a>{% else %}&lt;&lt; Older results{% endif %} | 
+{% if results.has_next %}<a href="{{ url_for('users.user_index', page=results.next_num) }}">Newer results &gt;&gt;</a>{% else %}Newer results &gt;&gt;{% endif %} 
 
  {% endblock %}

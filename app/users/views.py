@@ -7,27 +7,33 @@ schema = SitesSchema()
 
 
 #main
-@users.route('/search/<int:page>', methods=['GET', 'POST'], )
 @users.route('/search', methods=['POST', 'GET'])
 def search(page=1):
-   results = None
-   if request.method == 'POST':
-           search_string = request.form['search']
-           #results = Sites.query.from_statement(db.text("select * from sites where search @@ to_tsquery(:search)")).params(search=search).all()
-           query = Sites.query.search(search_string)
-           #query.search('somesearchstring')
-           results = query.paginate(page=1, per_page=1, error_out=True)
-           
-           #paginate(page, per_page=1, error_out=True).search(search).all()
-           #results = schema.dump(query, many=True).data
-   return render_template('search.html', results=results)
+  
+   return render_template('search.html')
+   
+   
+@users.route('/results/<int:page>', methods=['GET','POST'] )
+@users.route('/results', methods=['POST'] )
+def results(page=1):
+   
+       #search_string = request.form['search']
+       search_string = request.args.get('search', '')
+       #results = Sites.query.from_statement(db.text("select * from sites where search @@ to_tsquery(:search)")).params(search=search).all()
+       query = Sites.query.search(search_string)           
+       results = query.paginate(page=page, per_page=1)           
+       #paginate(page, per_page=1, error_out=True).search(search).all()
+       #results = schema.dump(query, many=True).data
+       return render_template('results.html', results=results)
    
 #Sites
+@users.route('/<int:page>' )
 @users.route('/' )
-def user_index():
-    print(db.func.to_tsquery("3.4"))
-    sites = Sites.query.all()
-    results = schema.dump(sites, many=True).data
+def user_index(page=1):
+    
+    sites = Sites.query
+    results = sites.paginate(page=page, per_page=5)
+    #results = schema.dump(sites, many=True).data
     return render_template('/users/index.html', results=results)
 
 @users.route('/add' , methods=['POST', 'GET'])
