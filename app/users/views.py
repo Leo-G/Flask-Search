@@ -12,16 +12,16 @@ def search(page=1):
   
    return render_template('search.html')
    
-   
-@users.route('/results/<int:page>', methods=['GET','POST'] )
+
+@users.route('/results/<int:page>', methods=['GET', 'POST'] )      
 @users.route('/results', methods=['POST'] )
 def results(page=1):
    
        #search_string = request.form['search']
-       search_string = request.args.get('search', '')
+       search_string = request.form['search']
        #results = Sites.query.from_statement(db.text("select * from sites where search @@ to_tsquery(:search)")).params(search=search).all()
        query = Sites.query.search(search_string)           
-       results = query.paginate(page=page, per_page=10)           
+       results = query.paginate(page=page, per_page=1)           
        #paginate(page, per_page=1, error_out=True).search(search).all()
        #results = schema.dump(query, many=True).data
        return render_template('results.html', results=results)
