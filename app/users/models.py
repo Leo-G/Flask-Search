@@ -45,9 +45,6 @@ class SitesSchema(Schema):
     content = fields.String()
     #add import sqlalchemy_utils in alembic file
     tag = fields.String(required = True, validate = not_blank)
-    
-     
-
 
     class Meta:
        fields = ('id', 'url', 'content', 'tag', 'search')

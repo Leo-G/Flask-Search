@@ -1,30 +1,40 @@
-from flask import Blueprint, render_template, request,flash, redirect, url_for
+from flask import Blueprint, render_template, request,flash, redirect, url_for, jsonify
 from app.users.models import Sites, SitesSchema, db
 
 users = Blueprint('users', __name__)
 #http://marshmallow.readthedocs.org/en/latest/quickstart.html#declaring-schemas
-schema = SitesSchema()
+schema = SitesSchema(only=('id','tag'))
 
 
-#main
+### SEARCH START ###
 @users.route('/search', methods=['POST', 'GET'])
 def search(page=1):
   
    return render_template('search.html')
    
 
-@users.route('/results/<int:page>', methods=['GET', 'POST'] )      
-@users.route('/results', methods=['POST'] )
-def results(page=1):
-   
-       #search_string = request.form['search']
-       search_string = request.form['search']
-       #results = Sites.query.from_statement(db.text("select * from sites where search @@ to_tsquery(:search)")).params(search=search).all()
-       query = Sites.query.search(search_string)           
-       results = query.paginate(page=page, per_page=1)           
-       #paginate(page, per_page=1, error_out=True).search(search).all()
-       #results = schema.dump(query, many=True).data
-       return render_template('results.html', results=results)
+@users.route('/results/<int:page>', methods=['GET'] )      
+@users.route('/results', defaults={'page': 1}, methods=['GET'] )
+def results(page):
+           search_string = request.args['search']
+           query = Sites.query.search(search_string)           
+           results = query.paginate(page=page, per_page=1)
+           return render_template('results.html', results=results)
+       
+       
+@users.route('/tags', methods=['GET'])
+def tags():
+    query = Sites.query.with_entities(Sites.id,Sites.tag).order_by(Sites.tag)
+    tags = schema.dump(query, many=True).data
+    return jsonify({"tags":tags})
+
+@users.route('/tag', methods=['GET'])
+def tag():
+    
+    return render_template('tag.html')
+       
+       
+### SEARCH END ###
    
 #Sites
 @users.route('/<int:page>' )
