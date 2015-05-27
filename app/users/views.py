@@ -18,7 +18,7 @@ def search(page=1):
 def results(page):
            search_string = request.args['search']
            query = Sites.query.search(search_string)           
-           results = query.paginate(page=page, per_page=1)
+           results = query.paginate(page=page, per_page=10)
            return render_template('results.html', results=results)
        
        
