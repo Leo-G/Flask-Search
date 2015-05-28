@@ -7,8 +7,8 @@ schema = SitesSchema(only=('id','tag'))
 
 
 ### SEARCH START ###
-@users.route('/search', methods=['POST', 'GET'])
-def search(page=1):
+@users.route('/search', methods=['GET'])
+def search():
   
    return render_template('search.html')
    
@@ -28,11 +28,12 @@ def tags():
     tags = schema.dump(query, many=True).data
     return jsonify({"tags":tags})
 
+## For testing only
 @users.route('/tag', methods=['GET'])
 def tag():
     
     return render_template('tag.html')
-       
+## End testing       
        
 ### SEARCH END ###
    
