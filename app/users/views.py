@@ -41,7 +41,6 @@ def tag():
 @users.route('/<int:page>' )
 @users.route('/' )
 def user_index(page=1):
-    
     sites = Sites.query
     results = sites.paginate(page=page, per_page=10)
     #results = schema.dump(sites, many=True).data
